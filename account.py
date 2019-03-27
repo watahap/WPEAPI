@@ -12,8 +12,7 @@ try:
     input = raw_input
 except NameError:
     pass
-user = 'f1dd77ca-e62b-42d3-b7e8-5c8e1c7f57b7'
-password = 'yoFYe9LYxRpAlgVmGXKP5A=='
+
 #user = input("What is your API Username?: ")
 #password = input("What is your API Pasword?: ")
 
