@@ -85,7 +85,7 @@ class WpeAccount:
             account_id_string = self.get_account_data()["results"][0]["id"]
             site_id = d['id']
             site_name = d['name']
-            new_name = '{}{}'.format(site_name[0:9:1], 'prd')
+            new_name = '{}{}'.format(site_name[0:12:1], 'prd')
             data = {'accept': 'application/json',
                     'Content-Type': 'application/json',
                     'name': new_name,
