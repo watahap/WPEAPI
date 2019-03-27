@@ -97,7 +97,8 @@ class WpeAccount:
             print('Creating install for', new_name)
             installs_results = requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
             if installs_results.status_code == 400:
-                print(new_name + installs_results.json()["errors"][0]["message"][5::])
+                error_message = '{}, {}'.format(new_name, installs_results.json()["errors"][0]["message"][5::])
+                print(error_message)
             else:
                 print(installs_results.json())
                 print(new_name, "created!")
