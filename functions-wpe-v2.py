@@ -100,6 +100,7 @@ class WpeAccount:
             if installs_results.status_code == 400:
                 error_message = '{}, {}'.format(new_name, installs_results.json()["errors"][0]["message"][5::])
                 print(error_message)
+                #If this install name is taken, lets try the first 10 characters of the domain name +prd, then 9,8, etc.
             else:
                 print(installs_results.json())
                 print(new_name, "created!")
