@@ -61,8 +61,16 @@ class WpeAccount:
         for line in domain_list:
             data["name"] = line
             data_json = json.dumps(data)
-            requests.post(self.sites_api, auth=(self.user, self.password), data=data_json)
-            time.sleep(150)
+
+            print('Creating', line)
+            sites_results = requests.post(self.sites_api, auth=(self.user, self.password), data=data_json)
+            if sites_results.status_code == 400:
+                print(line + sites_results.json()['errors'][0]["message"])
+            else:
+                print(sites_results.json())
+                print(line, 'created!')
+
+            #time.sleep(150)
 
     def get_sites_data(self):
         if self.sites_results is None:
@@ -85,12 +93,21 @@ class WpeAccount:
                     'environment': 'production'
                     }
             data_json = json.dumps(data)
-            requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
-            time.sleep(150)
+
+            print('Creating', new_name)
+            installs_results = requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
+            if installs_results.status_code == 400:
+                print(new_name + installs_results.json()["errors"][0]["message"])
+            else:
+                print(installs_results.json())
+                print(new_name, "created!")
+
+
+            #time.sleep(150)
 
     def get_installs_data(self):
         if self.install_results is None:
-            self.install_results = requests.get(self.installs_api, auth = (self.user, self.password))
+            self.install_results = requests.get(self.installs_api, auth=(self.user, self.password))
 
         return self.install_results.json()
 
@@ -111,10 +128,6 @@ class WpeAccount:
                 time.sleep(150)
 
 
-
-
-
-
 if __name__ == '__main__':
     wpe = WpeAccount()
     wpe.get_creds()
@@ -122,4 +135,4 @@ if __name__ == '__main__':
     account_id_string = wpe.get_account_data()
     wpe.create_site_experience(domain_list)
     wpe.create_installs()
-    wpe.configure_domains(domain_list)
+    #wpe.configure_domains(domain_list)
