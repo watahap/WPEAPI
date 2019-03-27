@@ -62,10 +62,10 @@ class WpeAccount:
             data["name"] = line
             data_json = json.dumps(data)
 
-            print('Creating', line)
+            print('Creating site experience for', line)
             sites_results = requests.post(self.sites_api, auth=(self.user, self.password), data=data_json)
             if sites_results.status_code == 400:
-                print(line + sites_results.json()['errors'][0]["message"])
+                print(line + sites_results.json()['errors'][0]["message"][12::])
             else:
                 print(sites_results.json())
                 print(line, 'created!')
@@ -94,10 +94,10 @@ class WpeAccount:
                     }
             data_json = json.dumps(data)
 
-            print('Creating', new_name)
+            print('Creating install for', new_name)
             installs_results = requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
             if installs_results.status_code == 400:
-                print(new_name + installs_results.json()["errors"][0]["message"])
+                print(new_name + installs_results.json()["errors"][0]["message"][5::])
             else:
                 print(installs_results.json())
                 print(new_name, "created!")

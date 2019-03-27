@@ -12,7 +12,8 @@ try:
     input = raw_input
 except NameError:
     pass
-
+user = 'f1dd77ca-e62b-42d3-b7e8-5c8e1c7f57b7'
+password = 'yoFYe9LYxRpAlgVmGXKP5A=='
 #user = input("What is your API Username?: ")
 #password = input("What is your API Pasword?: ")
 
@@ -25,18 +26,17 @@ installs_url = "https://api.wpengineapi.com/v1/installs"
 # data_results = sites_data["results"]
 # pprint(data_results)
 
-for i in range(5):
-    payload =  {'accept': 'application/json',
-                'Content-Type': 'application/json',
-                'name': 'littkebdrpr{0}'.format(i),
-                'account_id': '0a7ff389-96c8-404b-922d-73fd855766f8',
-                'site_id': '2779b60a-a615-4346-a969-7378a0f5ab16',
-                'environment': 'development'
-                }
+payload =  {'accept': 'application/json',
+            'Content-Type': 'application/json',
+            'name': 'littkebdrprd',
+            'account_id': '0a7ff389-96c8-404b-922d-73fd855766f8',
+            'site_id': '2779b60a-a615-4346-a969-7378a0f5ab16',
+            'environment': 'production'
+            }
 
-    payload_json = json.dumps(payload)
-    test_response = requests.post(installs_url, auth = (user, password), data=payload_json)
-    pprint(test_response.json())
+payload_json = json.dumps(payload)
+test_response = requests.post(installs_url, auth = (user, password), data=payload_json)
+pprint(test_response.json()["errors"][0]["message"][5::])
 # if test_response.status_code == 400:
 #     #print(type(test_response.json()))
 #     print(test_response.json()["errors"][0]["message"])
