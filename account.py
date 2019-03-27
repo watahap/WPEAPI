@@ -12,8 +12,7 @@ try:
     input = raw_input
 except NameError:
     pass
-user = 'f1dd77ca-e62b-42d3-b7e8-5c8e1c7f57b7'
-password = 'yoFYe9LYxRpAlgVmGXKP5A=='
+
 #user = input("What is your API Username?: ")
 #password = input("What is your API Pasword?: ")
 
@@ -33,13 +32,15 @@ payload =  {'accept': 'application/json',
             'site_id': '2779b60a-a615-4346-a969-7378a0f5ab16',
             'environment': 'production'
             }
-
+name = 'littkebdrprd'
 payload_json = json.dumps(payload)
 test_response = requests.post(installs_url, auth = (user, password), data=payload_json)
-pprint(test_response.json()["errors"][0]["message"][5::])
-# if test_response.status_code == 400:
-#     #print(type(test_response.json()))
-#     print(test_response.json()["errors"][0]["message"])
+#pprint(test_response.json()["errors"][0]["message"][5::])
+if test_response.status_code == 400:
+    #print(type(test_response.json()))
+    error_message = '{}, {}'.format(name, test_response.json()["errors"][0]["message"][5::])
+
+    print(error_message)
 
 
 # pprint(test_response)
