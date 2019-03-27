@@ -12,7 +12,8 @@ try:
     input = raw_input
 except NameError:
     pass
-
+user = 'f1dd77ca-e62b-42d3-b7e8-5c8e1c7f57b7'
+password = 'yoFYe9LYxRpAlgVmGXKP5A=='
 #user = input("What is your API Username?: ")
 #password = input("What is your API Pasword?: ")
 
@@ -21,26 +22,56 @@ account_url = "https://api.wpengineapi.com/v0/accounts?limit=100&offset=0"
 sites_url = "https://api.wpengineapi.com/v1/sites"
 installs_url = "https://api.wpengineapi.com/v1/installs"
 
+sites_results = requests.get(sites_url, auth=(user, password))
+#pprint(type(sites_results.json()))
+#account_id_string = sites_results.json()["results"][0]["id"]
+#pprint(account_id_string)
+data = {'accept': 'application/json',
+        'Content-Type': 'application/json',
+        'name': 'LitTkEbdrB.com',
+        'account_id': '0a7ff389-96c8-404b-922d-73fd855766f8'
+        }
+data_json = json.dumps(data)
+site_result = requests.post(sites_url, auth=(user, password), data=data_json)
+if site_result.status_code == 400:
+    #print(type(site_result.json()))
+    error_message = '{}, {}'.format('LitTkEbdrB.com', site_result.json()["errors"][0]["message"])
+    print(error_message)
+
+
+
+# print('Creating install for', new_name)
+#             installs_results = requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
+#             if installs_results.status_code == 400:
+#                 error_message = '{}, {}'.format(new_name, installs_results.json()["errors"][0]["message"][5::])
+#                 print(error_message)
+#             else:
+#                 print(installs_results.json())
+#                 print(new_name, "created!")
+
+
+
+
 # sites_data = requests.get(sites_url, auth=(user, password)).json()
 # data_results = sites_data["results"]
 # pprint(data_results)
 
-payload =  {'accept': 'application/json',
-            'Content-Type': 'application/json',
-            'name': 'littkebdrprd',
-            'account_id': '0a7ff389-96c8-404b-922d-73fd855766f8',
-            'site_id': '2779b60a-a615-4346-a969-7378a0f5ab16',
-            'environment': 'production'
-            }
-name = 'littkebdrprd'
-payload_json = json.dumps(payload)
-test_response = requests.post(installs_url, auth = (user, password), data=payload_json)
-#pprint(test_response.json()["errors"][0]["message"][5::])
-if test_response.status_code == 400:
-    #print(type(test_response.json()))
-    error_message = '{}, {}'.format(name, test_response.json()["errors"][0]["message"][5::])
-
-    print(error_message)
+# payload =  {'accept': 'application/json',
+#             'Content-Type': 'application/json',
+#             'name': 'littkebdrprd',
+#             'account_id': '0a7ff389-96c8-404b-922d-73fd855766f8',
+#             'site_id': '2779b60a-a615-4346-a969-7378a0f5ab16',
+#             'environment': 'production'
+#             }
+# name = 'littkebdrprd'
+# payload_json = json.dumps(payload)
+# test_response = requests.post(installs_url, auth = (user, password), data=payload_json)
+# #pprint(test_response.json()["errors"][0]["message"][5::])
+# if test_response.status_code == 400:
+#     #print(type(test_response.json()))
+#     error_message = '{}, {}'.format(name, test_response.json()["errors"][0]["message"][5::])
+#
+#     print(error_message)
 
 
 # pprint(test_response)

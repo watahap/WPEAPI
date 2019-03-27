@@ -65,7 +65,8 @@ class WpeAccount:
             print('Creating site experience for', line)
             sites_results = requests.post(self.sites_api, auth=(self.user, self.password), data=data_json)
             if sites_results.status_code == 400:
-                print(line + sites_results.json()['errors'][0]["message"][12::])
+                error_message = '{}, {}'.format(line, site_result.json()["errors"][0]["message"])
+                print(error_message)
             else:
                 print(sites_results.json())
                 print(line, 'created!')
