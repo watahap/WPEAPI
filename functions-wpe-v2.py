@@ -43,6 +43,7 @@ class WpeAccount:
             # Checking for blank lines
             if line:
                 domain_list.append(stripped_line)
+
         return domain_list
         # Put Error checking here for duplicate domain names, or domains that are larger than 40 characters, or ones that start with numeric characters.
 
@@ -65,10 +66,10 @@ class WpeAccount:
             print('Creating site experience for', line)
             sites_results = requests.post(self.sites_api, auth=(self.user, self.password), data=data_json)
             if sites_results.status_code == 400:
-                error_message = '{}, {}'.format(line, site_result.json()["errors"][0]["message"])
+                error_message = '{}, {}'.format(line, sites_result.json()["errors"][0]["message"])
                 print(error_message)
             else:
-                print(sites_results.json())
+                #print(sites_results.json())
                 print(line, 'created!')
 
             #time.sleep(150)
@@ -102,7 +103,7 @@ class WpeAccount:
                 print(error_message)
                 #If this install name is taken, lets try the first 10 characters of the domain name +prd, then 9,8, etc.
             else:
-                print(installs_results.json())
+                #print(installs_results.json())
                 print(new_name, "created!")
 
 
@@ -117,18 +118,18 @@ class WpeAccount:
     def configure_domains(self, domain_list):
         data_results = self.get_installs_data()["results"]
         for d in data_results:
-            install_id = data_results[0]['id']
-            for line in domain_list:
-                data = {'name': '',
-                        'duplicate': 'false',
-                        'primary': True,
-                        'id': install_id
-                        }
-                data['name'] = line
-                data_json = json.dumps(data)
-                installs_url = '{}/{}/{}'.format(self.installs_api, install_id, 'domains')
-                requests.post(installs_url, auth=(self.user, self.password), data=data_json)
-                time.sleep(150)
+            install_id = d['id']
+        for line in domain_list:
+            data = {'name': '',
+                    'duplicate': 'false',
+                    'primary': True,
+                    'id': install_id
+                    }
+            data['name'] = line
+            data_json = json.dumps(data)
+            installs_url = '{}/{}/{}'.format(self.installs_api, install_id, 'domains')
+            requests.post(installs_url, auth=(self.user, self.password), data=data_json)
+            time.sleep(150)
 
 
 if __name__ == '__main__':
