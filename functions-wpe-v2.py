@@ -102,6 +102,9 @@ class WpeAccount:
             if installs_results.status_code == 400:
                 error_message = '{}, {}'.format(new_name, installs_results.json()["errors"][0]["message"][5::])
                 print(error_message)
+
+
+                print('Trying with shorter install name...')
                 newer_name = '{}{}'.format(site_name[0:11:1], 'prd')
                 new_data = {'accept': 'application/json',
                             'Content-Type': 'application/json',
@@ -115,6 +118,9 @@ class WpeAccount:
                 if retry_results.status.code == 400:
                     new_error_message = '{}, {}'.format(newer_name, retry_results.json()["errors"][0]["message"][5::])
                     print(new_error_message)
+
+
+                    print('Trying with even shorter install name...')
                     last_name = '{}{}'.format(site_name[0:10:1], 'prd')
                     last_data = {'accept': 'application/json',
                                  'Content-Type': 'application/json',
@@ -126,8 +132,7 @@ class WpeAccount:
                     last_data_json = json.dumps(last_data)
                     last_results = requests.post(self.installs_api, auth=(self.user, self.password), data=last_data_json)
                     if last_results.status.code == 400:
-                    # Come back to this, comment the code more, and print Trying again for each post request.
-                #If this install name is taken, lets try the first 10 characters of the domain name +prd, then 9,8, etc.
+                        print('Please revisit this install')
             else:
                 #print(installs_results.json())
                 print(new_name, "created!")
