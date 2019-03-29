@@ -96,11 +96,37 @@ class WpeAccount:
                     }
             data_json = json.dumps(data)
 
+
             print('Creating install for', new_name)
             installs_results = requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
             if installs_results.status_code == 400:
                 error_message = '{}, {}'.format(new_name, installs_results.json()["errors"][0]["message"][5::])
                 print(error_message)
+                newer_name = '{}{}'.format(site_name[0:11:1], 'prd')
+                new_data = {'accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'name': newer_name,
+                            'account_id': account_id_string,
+                            'site_id': site_id,
+                            'environment': 'production'
+                            }
+                new_data_json = json.dumps(new_data)
+                retry_results = requests.post(self.installs_api, auth=(self.user, self.password), data=new_data_json)
+                if retry_results.status.code == 400:
+                    new_error_message = '{}, {}'.format(newer_name, retry_results.json()["errors"][0]["message"][5::])
+                    print(new_error_message)
+                    last_name = '{}{}'.format(site_name[0:10:1], 'prd')
+                    last_data = {'accept': 'application/json',
+                                 'Content-Type': 'application/json',
+                                 'name': last_name,
+                                 'account_id': account_id_string,
+                                 'site_id': site_id,
+                                 'environment': 'production'
+                                }
+                    last_data_json = json.dumps(last_data)
+                    last_results = requests.post(self.installs_api, auth=(self.user, self.password), data=last_data_json)
+                    if last_results.status.code == 400:
+                    # Come back to this, comment the code more, and print Trying again for each post request.
                 #If this install name is taken, lets try the first 10 characters of the domain name +prd, then 9,8, etc.
             else:
                 #print(installs_results.json())
