@@ -40,6 +40,10 @@ class WpeAccount:
 
         for line in domains:
             stripped_line = re.sub('(https?://)?(www.)?', '', line)
+                if len(stripped_line) >= 40:
+                    domain_list.append(stripped_line[0:30:1])
+                if stripped_line[0].isdigit == True:
+                    domain_list.append(stripped_line[1:30:1])
             # Checking for blank lines
             if line:
                 domain_list.append(stripped_line)
