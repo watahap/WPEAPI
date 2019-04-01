@@ -138,7 +138,7 @@ class WpeAccount:
                 print(new_name, "created!")
 
 
-            #time.sleep(150)
+            time.sleep(150)
 
     def get_installs_data(self):
         if self.install_results is None:
@@ -147,20 +147,19 @@ class WpeAccount:
         return self.install_results.json()
 
     def configure_domains(self, domain_list):
-        data_results = self.get_installs_data()["results"]
+        data_results = self.get_sites_data()["results"]
         for d in data_results:
-            install_id = d['id']
-        for line in domain_list:
-            data = {'name': '',
-                    'duplicate': 'false',
+            install_id = d['installs'][0]["id"]
+            domain_name = d['name']
+            data = {'name': domain_name,
+                    'duplicate': False,
                     'primary': True,
-                    'id': install_id
+                    'id': install_id,
                     }
-            data['name'] = line
             data_json = json.dumps(data)
-            installs_url = '{}/{}/{}'.format(self.installs_api, install_id, 'domains')
-            requests.post(installs_url, auth=(self.user, self.password), data=data_json)
-            time.sleep(150)
+                installs_url = '{}/{}/{}'.format(self.installs_api, install_id, 'domains')
+                requests.post(installs_url, auth=(self.user, self.password), data=data_json)
+                time.sleep(150)
 
 
 if __name__ == '__main__':
@@ -170,4 +169,4 @@ if __name__ == '__main__':
     account_id_string = wpe.get_account_data()
     wpe.create_site_experience(domain_list)
     wpe.create_installs()
-    #wpe.configure_domains(domain_list)
+    wpe.configure_domains(domain_list)
