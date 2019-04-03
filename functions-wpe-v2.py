@@ -47,21 +47,8 @@ class WpeAccount:
                 domain = '{}.{}'.format(domain[0:30:1], 'com')
             clean_domain = re.sub('\t|\s|\r', '', domain)
             filtered_domains.append(clean_domain)
-        # print(filtered_domains)
-
-        # for line in domains:
-            # stripped_line = re.sub('(https?://)?(www.)?', '', line)
-            # if len(stripped_line) >= 40:
-            #     short_domain = '{}.{}'.format(stripped_line[0:30:1],'com')
-            # # if stripped_line[0].isdigit() == True:
-            # #     domain_list.append(stripped_line[1:30:1])
-            # # Checking for blank lines
-            # if line:
-            #     domain_list.append(stripped_line)
-            # pprint(domain_list)
 
         return filtered_domains
-        # Put Error checking here for duplicate domain names, or domains that are larger than 40 characters, or ones that start with numeric characters.
 
     def get_account_data(self):
         account_r = requests.get(self.account_api, auth=(self.user, self.password))
@@ -116,13 +103,13 @@ class WpeAccount:
             print('Creating install for', new_name)
             installs_results = requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
             time.sleep(150)
+            if installs_results.status_code == 200:
+                print(new_name, 'created successfully')
             if installs_results.status_code == 400:
                 error_message = '{}, {}'.format(new_name, installs_results.json()["errors"][0]["message"][5::])
                 print(error_message)
-
-
                 print('Trying with shorter install name...')
-                newer_name = '{}{}'.format(site_name[0:11:1], 'prd')
+                newer_name = '{}{}'.format(clean_name[0:10:1], 'prd')
                 new_data = {'accept': 'application/json',
                             'Content-Type': 'application/json',
                             'name': newer_name,
@@ -133,14 +120,13 @@ class WpeAccount:
                 new_data_json = json.dumps(new_data)
                 retry_results = requests.post(self.installs_api, auth=(self.user, self.password), data=new_data_json)
                 time.sleep(150)
-                print(newer_name, 'created')
+                if retry_results.status_code == 200:
+                    print(newer_name, 'created successfully')
                 if retry_results.status_code == 400:
                     new_error_message = '{}, {}'.format(newer_name, retry_results.json()["errors"][0]["message"][5::])
                     print(new_error_message)
-
-
                     print('Trying with even shorter install name...')
-                    last_name = '{}{}'.format(site_name[0:10:1], 'prd')
+                    last_name = '{}{}'.format(clean_name[0:9:1], 'prd')
                     last_data = {'accept': 'application/json',
                                  'Content-Type': 'application/json',
                                  'name': last_name,
@@ -151,15 +137,11 @@ class WpeAccount:
                     last_data_json = json.dumps(last_data)
                     last_results = requests.post(self.installs_api, auth=(self.user, self.password), data=last_data_json)
                     time.sleep(150)
-                    print(last_name, 'created')
+                    if last_results.status_code == 200:
+                        print(last_name, 'created successfully')
                     if last_results.status_code == 400:
                         print('Please revisit this install')
-            else:
-                #print(installs_results.json())
-                print(new_name, "created!")
 
-
-            time.sleep(150)
 
     def get_installs_data(self):
         if self.install_results is None:
@@ -177,11 +159,17 @@ class WpeAccount:
                     'primary': True,
                     'id': install_id,
                     }
+
+
             data_json = json.dumps(data)
             installs_url = '{}/{}/{}'.format(self.installs_api, install_id, 'domains')
-            requests.post(installs_url, auth=(self.user, self.password), data=data_json)
+            print('Adding domain for', domain_name)
+            domain_results = requests.post(installs_url, auth=(self.user, self.password), data=data_json)
             time.sleep(150)
-
+            if domain_results.status_code == 400:
+                print(domain_results.json())
+            else:
+                print(domain_name, 'configured successfully')
 
 if __name__ == '__main__':
     wpe = WpeAccount()
@@ -190,4 +178,4 @@ if __name__ == '__main__':
     account_id_string = wpe.get_account_data()
     wpe.create_site_experience(filtered_domains)
     wpe.create_installs()
-    wpe.configure_domains(filtered_domains)
+    wpe.configure_domains()
