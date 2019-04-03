@@ -4,7 +4,7 @@ import re
 import requests
 import json
 import time
-
+from string import digits
 from pprint import pprint
 
 
@@ -32,30 +32,42 @@ class WpeAccount:
         return self.user, self.password
 
     def get_cleaned_domains(self):
-        domain_list = []
 
         with open('domains.txt', 'r') as f:
 
             domains = f.read().splitlines()
 
-        for line in domains:
-            stripped_line = re.sub('(https?://)?(www.)?', '', line)
-                if len(stripped_line) >= 40:
-                    domain_list.append(stripped_line[0:30:1])
-                if stripped_line[0].isdigit == True:
-                    domain_list.append(stripped_line[1:30:1])
-            # Checking for blank lines
-            if line:
-                domain_list.append(stripped_line)
+        filtered_domains = []
 
-        return domain_list
+        for line in domains:
+            domain = re.sub('(https?://)?(www.)?', '', line)
+            if domain[0].isdigit() == True:
+                domain = domain.lstrip(digits)
+            if len(domain) >= 40:
+                domain = '{}.{}'.format(domain[0:30:1], 'com')
+            clean_domain = re.sub('\t|\s|\r|', '', domain)
+            filtered_domains.append(clean_domain)
+        # print(filtered_domains)
+
+        # for line in domains:
+            # stripped_line = re.sub('(https?://)?(www.)?', '', line)
+            # if len(stripped_line) >= 40:
+            #     short_domain = '{}.{}'.format(stripped_line[0:30:1],'com')
+            # # if stripped_line[0].isdigit() == True:
+            # #     domain_list.append(stripped_line[1:30:1])
+            # # Checking for blank lines
+            # if line:
+            #     domain_list.append(stripped_line)
+            # pprint(domain_list)
+
+        return filtered_domains
         # Put Error checking here for duplicate domain names, or domains that are larger than 40 characters, or ones that start with numeric characters.
 
     def get_account_data(self):
         account_r = requests.get(self.account_api, auth=(self.user, self.password))
         return account_r.json()
 
-    def create_site_experience(self, domain_list):
+    def create_site_experience(self, filtered_domains):
         account_id_string = self.get_account_data()["results"][0]["id"]
         data = {'accept': 'application/json',
                 'Content-Type': 'application/json',
@@ -63,7 +75,7 @@ class WpeAccount:
                 'account_id': account_id_string
                 }
 
-        for line in domain_list:
+        for line in filtered_domains:
             data["name"] = line
             data_json = json.dumps(data)
 
@@ -76,7 +88,6 @@ class WpeAccount:
                 #print(sites_results.json())
                 print(line, 'created!')
 
-            #time.sleep(150)
 
     def get_sites_data(self):
         if self.sites_results is None:
@@ -103,6 +114,7 @@ class WpeAccount:
 
             print('Creating install for', new_name)
             installs_results = requests.post(self.installs_api, auth=(self.user, self.password), data=data_json)
+            time.sleep(150)
             if installs_results.status_code == 400:
                 error_message = '{}, {}'.format(new_name, installs_results.json()["errors"][0]["message"][5::])
                 print(error_message)
@@ -119,7 +131,8 @@ class WpeAccount:
                             }
                 new_data_json = json.dumps(new_data)
                 retry_results = requests.post(self.installs_api, auth=(self.user, self.password), data=new_data_json)
-                if retry_results.status.code == 400:
+                time.sleep(150)
+                if retry_results.status_code == 400:
                     new_error_message = '{}, {}'.format(newer_name, retry_results.json()["errors"][0]["message"][5::])
                     print(new_error_message)
 
@@ -135,7 +148,8 @@ class WpeAccount:
                                 }
                     last_data_json = json.dumps(last_data)
                     last_results = requests.post(self.installs_api, auth=(self.user, self.password), data=last_data_json)
-                    if last_results.status.code == 400:
+                    time.sleep(150)
+                    if last_results.status_code == 400:
                         print('Please revisit this install')
             else:
                 #print(installs_results.json())
@@ -150,7 +164,7 @@ class WpeAccount:
 
         return self.install_results.json()
 
-    def configure_domains(self, domain_list):
+    def configure_domains(self):
         data_results = self.get_sites_data()["results"]
         for d in data_results:
             install_id = d['installs'][0]["id"]
@@ -161,16 +175,16 @@ class WpeAccount:
                     'id': install_id,
                     }
             data_json = json.dumps(data)
-                installs_url = '{}/{}/{}'.format(self.installs_api, install_id, 'domains')
-                requests.post(installs_url, auth=(self.user, self.password), data=data_json)
-                time.sleep(150)
+            installs_url = '{}/{}/{}'.format(self.installs_api, install_id, 'domains')
+            requests.post(installs_url, auth=(self.user, self.password), data=data_json)
+            time.sleep(150)
 
 
 if __name__ == '__main__':
     wpe = WpeAccount()
     wpe.get_creds()
-    domain_list = wpe.get_cleaned_domains()
+    filtered_domains = wpe.get_cleaned_domains()
     account_id_string = wpe.get_account_data()
-    wpe.create_site_experience(domain_list)
+    wpe.create_site_experience(filtered_domains)
     wpe.create_installs()
-    wpe.configure_domains(domain_list)
+    wpe.configure_domains(filtered_domains)
