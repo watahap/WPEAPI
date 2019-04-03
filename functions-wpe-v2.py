@@ -45,7 +45,7 @@ class WpeAccount:
                 domain = domain.lstrip(digits)
             if len(domain) >= 40:
                 domain = '{}.{}'.format(domain[0:30:1], 'com')
-            clean_domain = re.sub('\t|\s|\r|', '', domain)
+            clean_domain = re.sub('\t|\s|\r', '', domain)
             filtered_domains.append(clean_domain)
         # print(filtered_domains)
 
@@ -101,7 +101,8 @@ class WpeAccount:
             account_id_string = self.get_account_data()["results"][0]["id"]
             site_id = d['id']
             site_name = d['name']
-            new_name = '{}{}'.format(site_name[0:12:1], 'prd')
+            clean_name = re.sub('\.|\-|\/', '', site_name)
+            new_name = '{}{}'.format(clean_name[0:11:1], 'prd')
             data = {'accept': 'application/json',
                     'Content-Type': 'application/json',
                     'name': new_name,
@@ -132,6 +133,7 @@ class WpeAccount:
                 new_data_json = json.dumps(new_data)
                 retry_results = requests.post(self.installs_api, auth=(self.user, self.password), data=new_data_json)
                 time.sleep(150)
+                print(newer_name, 'created')
                 if retry_results.status_code == 400:
                     new_error_message = '{}, {}'.format(newer_name, retry_results.json()["errors"][0]["message"][5::])
                     print(new_error_message)
@@ -149,6 +151,7 @@ class WpeAccount:
                     last_data_json = json.dumps(last_data)
                     last_results = requests.post(self.installs_api, auth=(self.user, self.password), data=last_data_json)
                     time.sleep(150)
+                    print(last_name, 'created')
                     if last_results.status_code == 400:
                         print('Please revisit this install')
             else:
