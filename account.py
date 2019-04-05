@@ -16,12 +16,16 @@ except NameError:
 #user = input("What is your API Username?: ")
 #password = input("What is your API Pasword?: ")
 
+
+user = 'f1dd77ca-e62b-42d3-b7e8-5c8e1c7f57b7'
+password = 'yoFYe9LYxRpAlgVmGXKP5A=='
+
 creds = ("{u}:{p}".format(u=user, p=password))
 account_url = "https://api.wpengineapi.com/v0/accounts?limit=100&offset=0"
 sites_url = "https://api.wpengineapi.com/v1/sites"
 installs_url = "https://api.wpengineapi.com/v1/installs"
 
-sites_results = requests.get(sites_url, auth=(user, password))
+#sites_results = requests.get(sites_url, auth=(user, password))
 #pprint(type(sites_results.json()))
 #account_id_string = sites_results.json()["results"][0]["id"]
 #pprint(account_id_string)
@@ -30,12 +34,20 @@ data = {'accept': 'application/json',
         'name': 'LitTkEbdrB.com',
         'account_id': '0a7ff389-96c8-404b-922d-73fd855766f8'
         }
-data_json = json.dumps(data)
-site_result = requests.post(sites_url, auth=(user, password), data=data_json)
-if site_result.status_code == 400:
-    #print(type(site_result.json()))
-    error_message = '{}, {}'.format('LitTkEbdrB.com', site_result.json()["errors"][0]["message"])
-    print(error_message)
+
+results = requests.get(sites_url, auth=(user, password))
+
+data_results = results.json()["results"]
+
+pprint(data_results)
+
+
+# data_json = json.dumps(data)
+# site_result = requests.post(sites_url, auth=(user, password), data=data_json)
+# if site_result.status_code == 400:
+#     #print(type(site_result.json()))
+#     error_message = '{}, {}'.format('LitTkEbdrB.com', site_result.json()["errors"][0]["message"])
+#     print(error_message)
 
 
 
