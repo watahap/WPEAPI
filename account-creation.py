@@ -167,6 +167,19 @@ class WpeAccount:
                 print(domain_results.json())
             if domain_results.status_code == 201:
                 print(domain_name, 'configured successfully')
+                www_domain = '{}.{}'.format('www',domain_name)
+                www_data = {'name': www_domain,
+                            'duplicate': False,
+                            'primary': True,
+                            }
+                www_json = json.dumps(www_data)
+                print('Adding domain for', www_domain)
+                www_domain_results = requests.post(installs_url, auth=(self.user, self.password), data=www_json)
+                time.sleep(150)
+                if www_domain_results.status_code == 400:
+                    print(www_domain_results.json())
+                if www_domain_results.status_code == 201:
+                    print(www_domain, 'configured successfully')
 
 if __name__ == '__main__':
     wpe = WpeAccount()
